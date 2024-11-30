@@ -1,6 +1,7 @@
 import { UserRepositoryInterface } from '@/repositories/user-repository-interface';
 import { User } from '@prisma/client';
 import { hash } from 'bcryptjs';
+import { UserAlreadyExistsError } from './errors/user-already-exists-error';
 
 interface RegisterUserRequest {
   name: string;
@@ -23,7 +24,7 @@ export class RegisterUser {
     const findEmailAlreadyExists = await this.userRepository.findByEmail(email);
 
     if (findEmailAlreadyExists) {
-      throw new Error('ja existe');
+      throw new UserAlreadyExistsError();
     }
 
     const password_hash = await hash(password, 6);
