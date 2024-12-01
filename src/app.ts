@@ -1,12 +1,17 @@
 import fastify from 'fastify';
 import { env } from './env';
 import { userRoutes } from './http/controllers/user/routes';
+import fastifyJwt from '@fastify/jwt';
 
 const app = fastify();
 
+app.register(fastifyJwt, {
+  secret: env.JWT_SECRET,
+});
+
 app.register(userRoutes);
 
-app.get('/', (request, reply) => {
+app.get('/', (_, reply) => {
   return reply.send('API in running! 🚀');
 });
 app

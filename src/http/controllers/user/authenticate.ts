@@ -17,9 +17,13 @@ export async function authenticate(
   try {
     const authenticateUseCase = makeAuthenticate();
     const { user } = await authenticateUseCase.execute({ email, password });
-    return reply
-      .status(200)
-      .send({ ...user, password_hash: null, created_at: null });
+
+    const token = await reply.jwtSign(
+      { role: user.role },
+      { sign: { sub: user.id, expiresIn: '7d' } }
+    );
+
+    return reply.status(200).send({ token: token });
   } catch (error) {
     if (error instanceof InvalidCredentilsError) {
       return reply.status(401).send({ message: error.message });
